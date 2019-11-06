@@ -15,6 +15,22 @@ fun dzielenie(item1: Double, item2: Double) : Double {
     else return Double.NaN
 }
 
+fun wpisz_liczbe() {
+    print("Wpisz liczbę: ")
+    val enteredValue: Double = readLine()!!.toDouble()
+    stackOfValues.push(enteredValue)
+}
+
+fun wpisz_znak() : Boolean {
+    print("Wpisz znak: ")
+    val enteredSign = readLine()!![0] //Czytaj tylko jeden, pierwszy wprowadzony znak
+    if (enteredSign in arrayOf ('+','-','/','*')) {
+        stackOfSigns.push(enteredSign)
+        return true
+    }
+    return false
+}
+
 fun dzialanie(){
     println("Przed dokonaniem działania")
     println("\t stackOfValues: $stackOfValues")
@@ -32,10 +48,9 @@ fun dzialanie(){
             System.exit(0)
         }
         else stackOfValues.push(wynik)
-
     }
 
-    println("Po dokonaniem działania")
+    println("Po dokonaniu działania")
     println("\t stackOfValues: $stackOfValues")
     println("\t stackOfSigns: $stackOfSigns")
 }
@@ -48,24 +63,16 @@ fun main() {
     do {
         if(poczatek) {
             poczatek = false
-            print("Wpisz liczbę: ")
-            val enteredValue: Double = readLine()!!.toDouble()
-            stackOfValues.push(enteredValue)
+            wpisz_liczbe()
         }
 
-        print("Wpisz znak: ")
-        val enteredSign = readLine()!![0] //Czytaj tylko jeden, pierwszy wprowadzony znak
-        if (enteredSign in arrayOf ('+','-','/','*')) stackOfSigns.push(enteredSign)
+        val kontynuuj : Boolean = wpisz_znak()
 
-        if(enteredSign != '=') {
-            print("Wpisz liczbę: ")
-            val enteredValue2: Double = readLine()!!.toDouble()
-            stackOfValues.push(enteredValue2)
-        }
+        if(kontynuuj) wpisz_liczbe()
 
         dzialanie()
 
-    } while (enteredSign != '=')
+    } while (kontynuuj)
 
     println("Wynik: $wynik")
 }
