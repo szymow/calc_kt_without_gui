@@ -27,7 +27,12 @@ fun dzialanie(){
             '*' -> wynik = mnozenie(stackOfValues.pop(), stackOfValues.pop())
             '/' -> wynik = dzielenie(stackOfValues.pop(), stackOfValues.pop())
         }
-        stackOfValues.push(wynik)
+        if (wynik.isNaN()){
+            print("Nie można dzielić przez zero")
+            System.exit(0)
+        }
+        else stackOfValues.push(wynik)
+
     }
 
     println("Po dokonaniem działania")
@@ -37,6 +42,7 @@ fun dzialanie(){
 
 
 fun main() {
+
     println("Szymon Woyda 227458")
 
     do {
@@ -47,7 +53,6 @@ fun main() {
             stackOfValues.push(enteredValue)
         }
 
-        dzialanie()
         print("Wpisz znak: ")
         val enteredSign = readLine()!![0] //Czytaj tylko jeden, pierwszy wprowadzony znak
         if (enteredSign in arrayOf ('+','-','/','*')) stackOfSigns.push(enteredSign)
@@ -57,6 +62,8 @@ fun main() {
             val enteredValue2: Double = readLine()!!.toDouble()
             stackOfValues.push(enteredValue2)
         }
+
+        dzialanie()
 
     } while (enteredSign != '=')
 
