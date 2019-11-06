@@ -12,9 +12,20 @@ var wyswietlacz = mutableListOf<String>()
 fun dodawanie(item1: Double, item2: Double): Double = item2 + item1
 fun odejmowanie(item1: Double, item2: Double): Double = item2 - item1
 fun mnozenie(item1: Double, item2: Double): Double = item1 * item2
-fun dzielenie(item1: Double, item2: Double) : Double {
-    if(item1 != 0.0) return item2 / item1
-    else return Double.NaN
+fun dzielenie(item1: Double, item2: Double) : Double = item2 / item1
+
+fun sprawdz_dziel0(value: Double){
+    if (stackOfSigns.isNotEmpty()){
+        if (stackOfSigns.peek() == ('/') && value == 0.0){
+            print("Nie można dzielić przez zero")
+            System.exit(0)
+        }
+    }
+}
+
+fun update(sign: Char){
+    stackOfSigns.push(sign)
+    wyswietlacz.add(sign.toString())
 }
 
 fun liczenie(){
@@ -25,17 +36,14 @@ fun liczenie(){
             '*' -> wynik = mnozenie(stackOfValues.pop(), stackOfValues.pop())
             '/' -> wynik = dzielenie(stackOfValues.pop(), stackOfValues.pop())
         }
-        if (wynik.isNaN()){
-            print("Nie można dzielić przez zero")
-            System.exit(0)
-        }
-        else stackOfValues.push(wynik)
+        stackOfValues.push(wynik)
     }
 }
 
 fun wpisz_liczbe() {
     print("Wpisz liczbę: ")
     val enteredValue: Double = readLine()!!.toDouble()
+    sprawdz_dziel0(enteredValue)
     stackOfValues.push(enteredValue)
     wyswietlacz.add(enteredValue.toString())
 }
@@ -45,33 +53,28 @@ fun wpisz_znak() : Boolean {
     val enteredSign = readLine()!![0] //Czytaj tylko jeden, pierwszy wprowadzony znak
     if(stackOfSigns.isEmpty()){
         if (enteredSign in arrayOf ('+','-','/','*')) {
-            stackOfSigns.push(enteredSign)
-            wyswietlacz.add(enteredSign.toString())
+            update(enteredSign)
             return true
         }
     }
     if (stackOfSigns.isNotEmpty()){
         if (enteredSign in arrayOf('+','-') && stackOfSigns.peek() in arrayOf('+','-')) {
             dzialanie()
-            stackOfSigns.push(enteredSign)
-            wyswietlacz.add(enteredSign.toString())
+            update(enteredSign)
             return true
         }
         if(enteredSign in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('+','-')){
-            stackOfSigns.push(enteredSign)
-            wyswietlacz.add(enteredSign.toString())
+            update(enteredSign)
             return true
         }
         if(enteredSign in arrayOf('+','-') && stackOfSigns.peek() in arrayOf('*','/')){
             dzialanie()
-            stackOfSigns.push(enteredSign)
-            wyswietlacz.add(enteredSign.toString())
+            update(enteredSign)
             return true
         }
         if (enteredSign in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('*','/')) {
             dzialanie()
-            stackOfSigns.push(enteredSign)
-            wyswietlacz.add(enteredSign.toString())
+            update(enteredSign)
             return true
         }
         if(enteredSign == '='){
@@ -96,9 +99,7 @@ fun dzialanie(){
     println("\t stackOfSigns: $stackOfSigns")
 }
 
-
 fun main() {
-
     println("Szymon Woyda 227458")
 
     do {
@@ -115,5 +116,3 @@ fun main() {
 
     println("Wynik: $wynik")
 }
-
-//https://chercher.tech/kotlin/stack-kotlin
