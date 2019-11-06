@@ -13,29 +13,38 @@ fun dzielenie(item1: Double, item2: Double) : Any {
 }
 
 
-fun main(args: Array<String>) {
+fun main() {
 
     println("Hello Kotlin!")
 
     var stackOfValues = Stack<Double>()
     var stackOfSigns = Stack<Char>()
 
-    print("Enter value: ")
-    val enteredValue : Double = readLine()!!.toDouble()
-    stackOfValues.push(enteredValue)
+    do {
+        print("Wpisz liczbę: ")
+        val enteredValue: Double = readLine()!!.toDouble()
+        stackOfValues.push(enteredValue)
 
-    print("Enter sign: ")
-    val enteredSign = readLine()!![0] //Czytaj tylko jeden, pierwszy wprowadzony znak
-    stackOfSigns.push(enteredSign)
+        print("Wpisz znak: ")
+        val enteredSign = readLine()!![0] //Czytaj tylko jeden, pierwszy wprowadzony znak
+        if (enteredSign in arrayOf ('+','-','/','*')) stackOfSigns.push(enteredSign)
 
-    print("Enter value: ")
-    val enteredValue2 : Double = readLine()!!.toDouble()
-    stackOfValues.push(enteredValue2)
+        if(enteredSign != '=') {
+            print("Wpisz liczbę: ")
+            val enteredValue2: Double = readLine()!!.toDouble()
+            stackOfValues.push(enteredValue2)
+        }
 
-    println("stackOfValues: " + stackOfValues)
-    println("stackOfSigns: " + stackOfSigns)
+        println("Wpisz {=} jeśli chcesz poznać wynik.")
+        println("Lub wpisz kolejny znak jeżeli chcesz kontynuować działanie.")
+        val enteredSign2 = readLine()!![0]
+        if (enteredSign2 in arrayOf ('+','-','/','*')) stackOfSigns.push(enteredSign2)
+    } while (enteredSign != '=' || enteredSign2 != '=')
 
-    if(stackOfSigns.isEmpty() == false || stackOfValues.isEmpty() == false)
+    println("stackOfValues: $stackOfValues")
+    println("stackOfSigns: $stackOfSigns")
+
+    if(!stackOfSigns.isEmpty() || !stackOfValues.isEmpty())
     when (stackOfSigns.pop()) {
         '+' -> wynik = dodawanie(stackOfValues.pop(),stackOfValues.pop())
         '-' -> wynik = odejmowanie(stackOfValues.pop(),stackOfValues.pop())
@@ -43,10 +52,10 @@ fun main(args: Array<String>) {
         '/' -> wynik = dzielenie(stackOfValues.pop(),stackOfValues.pop())
         }
 
-    println("Wynik: " + wynik)
+    println("Wynik: $wynik")
 
-    println("stackOfValues: " + stackOfValues)
-    println("stackOfSigns: " + stackOfSigns)
+    println("stackOfValues: $stackOfValues")
+    println("stackOfSigns: $stackOfSigns")
 }
 
 //https://chercher.tech/kotlin/stack-kotlin
