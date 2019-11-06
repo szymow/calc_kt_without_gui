@@ -1,31 +1,14 @@
-
-class StackWithList{
-    val elements: MutableList<Any> = mutableListOf()
-    fun isStackEmpty() = elements.isEmpty()
-    fun size() = elements.size
-    fun push(item: Any) = elements.add(item)
-    fun pop() : Any? {
-        val item = elements.lastOrNull()
-        if(!isStackEmpty()){
-            elements.removeAt(size()-1)
-        }
-        return item
-    }
-    fun peek(): Any? = elements.lastOrNull()
-
-    override fun toString(): String = elements.toString()
-}
-
+import java.util.Stack
 
 val set_of_signs = charArrayOf('+','-','*','/')
 var wynik : Any = 0
-var niewlasciwyznak  = false
 
-fun dodawanie(item1: Int, item2: Int): Int = item1 + item2
-fun odejmowanie(item1: Int, item2: Int): Int = item1 - item2
-fun mnozenie(item1: Int, item2: Int): Int = item1 * item2
-fun dzielenie(item1: Int, item2: Int) : Any {
-    if(item2 != 0) return item1 / item2
+//Zamiana kolejności itemów związana jest z kolejnością zdejmowania wartości ze stosu
+fun dodawanie(item1: Double, item2: Double): Double = item2 + item1
+fun odejmowanie(item1: Double, item2: Double): Double = item2 - item1
+fun mnozenie(item1: Double, item2: Double): Double = item2 * item1
+fun dzielenie(item1: Double, item2: Double) : Any {
+    if(item1 != 0.0) return item2 / item1
     else return "DZIEL0"
 }
 
@@ -34,11 +17,11 @@ fun main(args: Array<String>) {
 
     println("Hello Kotlin!")
 
-    var stackOfValues = StackWithList()
-    var stackOfSigns = StackWithList()
+    var stackOfValues = Stack<Double>()
+    var stackOfSigns = Stack<Char>()
 
     print("Enter value: ")
-    val enteredValue = Integer.valueOf(readLine())
+    val enteredValue : Double = readLine()!!.toDouble()
     stackOfValues.push(enteredValue)
 
     print("Enter sign: ")
@@ -46,29 +29,24 @@ fun main(args: Array<String>) {
     stackOfSigns.push(enteredSign)
 
     print("Enter value: ")
-    val enteredValue2 = Integer.valueOf(readLine())
+    val enteredValue2 : Double = readLine()!!.toDouble()
     stackOfValues.push(enteredValue2)
 
     println("stackOfValues: " + stackOfValues)
     println("stackOfSigns: " + stackOfSigns)
 
-    when (enteredSign) {
-        '+' -> wynik = dodawanie(enteredValue,enteredValue2)
-        '-' -> wynik = odejmowanie(enteredValue,enteredValue2)
-        '*' -> wynik = mnozenie(enteredValue,enteredValue2)
-        '/' -> wynik = dzielenie(enteredValue,enteredValue2)
-
-        else -> { // Note the block
-            niewlasciwyznak = true
-//            print("Niewłaściwy znak \n")
+    if(stackOfSigns.isEmpty() == false || stackOfValues.isEmpty() == false)
+    when (stackOfSigns.pop()) {
+        '+' -> wynik = dodawanie(stackOfValues.pop(),stackOfValues.pop())
+        '-' -> wynik = odejmowanie(stackOfValues.pop(),stackOfValues.pop())
+        '*' -> wynik = mnozenie(stackOfValues.pop(),stackOfValues.pop())
+        '/' -> wynik = dzielenie(stackOfValues.pop(),stackOfValues.pop())
         }
-    }
-    if(!niewlasciwyznak){
-        println("Wynik: " + wynik)
-    }
-    else
-    println("Wynik: " + "niewłaściwy znak")
 
+    println("Wynik: " + wynik)
+
+    println("stackOfValues: " + stackOfValues)
+    println("stackOfSigns: " + stackOfSigns)
 }
 
 //https://chercher.tech/kotlin/stack-kotlin
