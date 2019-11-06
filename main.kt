@@ -1,6 +1,7 @@
 import java.util.Stack
 
 var wynik : Double = 0.0
+var poczatek : Boolean = true
 
 var stackOfValues = Stack<Double>()
 var stackOfSigns = Stack<Char>()
@@ -15,26 +16,38 @@ fun dzielenie(item1: Double, item2: Double) : Double {
 }
 
 fun dzialanie(){
-    if(!stackOfSigns.isEmpty() || !stackOfValues.isEmpty())
+    println("Przed dokonaniem działania")
+    println("\t stackOfValues: $stackOfValues")
+    println("\t stackOfSigns: $stackOfSigns")
+
+    if(!stackOfSigns.isEmpty() && !stackOfValues.isEmpty()) {
         when (stackOfSigns.pop()) {
-            '+' -> wynik = dodawanie(stackOfValues.pop(),stackOfValues.pop())
-            '-' -> wynik = odejmowanie(stackOfValues.pop(),stackOfValues.pop())
-            '*' -> wynik = mnozenie(stackOfValues.pop(),stackOfValues.pop())
-            '/' -> wynik = dzielenie(stackOfValues.pop(),stackOfValues.pop())
+            '+' -> wynik = dodawanie(stackOfValues.pop(), stackOfValues.pop())
+            '-' -> wynik = odejmowanie(stackOfValues.pop(), stackOfValues.pop())
+            '*' -> wynik = mnozenie(stackOfValues.pop(), stackOfValues.pop())
+            '/' -> wynik = dzielenie(stackOfValues.pop(), stackOfValues.pop())
         }
-    stackOfValues.push(wynik)
+        stackOfValues.push(wynik)
+    }
+
+    println("Po dokonaniem działania")
+    println("\t stackOfValues: $stackOfValues")
+    println("\t stackOfSigns: $stackOfSigns")
 }
 
 
 fun main() {
-
-    println("Hello Kotlin!")
+    println("Szymon Woyda 227458")
 
     do {
-        print("Wpisz liczbę: ")
-        val enteredValue: Double = readLine()!!.toDouble()
-        stackOfValues.push(enteredValue)
+        if(poczatek) {
+            poczatek = false
+            print("Wpisz liczbę: ")
+            val enteredValue: Double = readLine()!!.toDouble()
+            stackOfValues.push(enteredValue)
+        }
 
+        dzialanie()
         print("Wpisz znak: ")
         val enteredSign = readLine()!![0] //Czytaj tylko jeden, pierwszy wprowadzony znak
         if (enteredSign in arrayOf ('+','-','/','*')) stackOfSigns.push(enteredSign)
@@ -45,23 +58,9 @@ fun main() {
             stackOfValues.push(enteredValue2)
         }
 
-        dzialanie()
-
-        println("Wpisz {=} jeśli chcesz poznać wynik.")
-        println("Lub wpisz kolejny znak jeżeli chcesz kontynuować działanie.")
-        val enteredSign2 = readLine()!![0]
-        if (enteredSign2 in arrayOf ('+','-','/','*')) stackOfSigns.push(enteredSign2)
-
-    } while (enteredSign != '=' && enteredSign2 != '=')
-
-    println("stackOfValues: $stackOfValues")
-    println("stackOfSigns: $stackOfSigns")
-    
+    } while (enteredSign != '=')
 
     println("Wynik: $wynik")
-
-    println("stackOfValues: $stackOfValues")
-    println("stackOfSigns: $stackOfSigns")
 }
 
 //https://chercher.tech/kotlin/stack-kotlin
