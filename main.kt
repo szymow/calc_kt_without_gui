@@ -14,6 +14,18 @@ fun odejmowanie(item1: Double, item2: Double): Double = item2 - item1
 fun mnozenie(item1: Double, item2: Double): Double = item1 * item2
 fun dzielenie(item1: Double, item2: Double) : Double = item2 / item1
 
+fun silnia(item1: Double) : Double{
+    val factorial : Double = silnia_recursja(item1)
+    return factorial
+}
+
+fun silnia_recursja(num: Double): Double {
+    if (num >= 1.0)
+        return num * silnia_recursja(num - 1.0)
+    else
+        return 1.0
+}
+
 fun sprawdz_dziel0(value: Double){
     if (stackOfSigns.isNotEmpty()){
         if (stackOfSigns.peek() == ('/') && value == 0.0){
@@ -30,6 +42,7 @@ fun update(sign: Char){
 
 fun liczenie(){
     if(stackOfSigns.isNotEmpty() && stackOfValues.isNotEmpty()) {
+
         when (stackOfSigns.pop()) {
             '+' -> wynik = dodawanie(stackOfValues.pop(), stackOfValues.pop())
             '-' -> wynik = odejmowanie(stackOfValues.pop(), stackOfValues.pop())
@@ -68,13 +81,14 @@ fun wpisano_znak(sign2 : Char) : Boolean {
         stackOfValues.push(0.0)
         wyswietlacz.add((0.0).toString())
     }
-    //'p' plus/minus +/-
-    if(sign2 == 'p'){
-        var zmiana_znaku = stackOfValues.pop()
+    //'p' plus/minus +/-    //'s' silnia n!
+    if(sign2 == 'p' || sign2 == 's'){
+        var zmiana = stackOfValues.pop()
         wyswietlacz.removeAt(wyswietlacz.lastIndex)
-        zmiana_znaku = -zmiana_znaku
-        stackOfValues.push(zmiana_znaku)
-        wyswietlacz.add(zmiana_znaku.toString())
+        if(sign2 == 'p') zmiana = -zmiana
+        if(sign2 == 's') zmiana = silnia(zmiana)
+        stackOfValues.push(zmiana)
+        wyswietlacz.add(zmiana.toString())
     }
     if(stackOfSigns.isEmpty()){
         if (sign2 in arrayOf ('+','-','/','*')) {
@@ -83,22 +97,14 @@ fun wpisano_znak(sign2 : Char) : Boolean {
         }
     }
     if (stackOfSigns.isNotEmpty()){
-        if (sign2 in arrayOf('+','-') && stackOfSigns.peek() in arrayOf('+','-')) {
+        if (sign2 in arrayOf('+','-') && stackOfSigns.peek() in arrayOf('+','-')||
+            sign2 in arrayOf('+','-') && stackOfSigns.peek() in arrayOf('*','/')||
+            sign2 in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('*','/')) {
             dzialanie()
             update(sign2)
             return true
         }
         if(sign2 in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('+','-')){
-            update(sign2)
-            return true
-        }
-        if(sign2 in arrayOf('+','-') && stackOfSigns.peek() in arrayOf('*','/')){
-            dzialanie()
-            update(sign2)
-            return true
-        }
-        if (sign2 in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('*','/')) {
-            dzialanie()
             update(sign2)
             return true
         }
