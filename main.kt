@@ -77,7 +77,7 @@ fun wpisano_liczbe(value2: Double) {
 
 fun wpisano_znak(sign2 : Char) : Boolean {
     //Jeżeli stos liczb jest pusty a został wpisany znak dodaj do stosu liczb 0 na poczatku
-    if(stackOfValues.isEmpty()){
+    if(stackOfValues.isEmpty() && sign2 != '('){
         stackOfValues.push(0.0)
         wyswietlacz.add((0.0).toString())
     }
@@ -89,22 +89,34 @@ fun wpisano_znak(sign2 : Char) : Boolean {
         if(sign2 == 's') zmiana = silnia(zmiana)
         stackOfValues.push(zmiana)
         wyswietlacz.add(zmiana.toString())
+        return false
     }
     if(stackOfSigns.isEmpty()){
-        if (sign2 in arrayOf ('+','-','/','*')) {
+        if (sign2 in arrayOf ('+','-','/','*','(')) {
             update(sign2)
             return true
         }
     }
     if (stackOfSigns.isNotEmpty()){
+        if (sign2 == ')'){
+            wyswietlacz.add(sign2.toString())
+            do dzialanie()
+            while(stackOfSigns.peek() != '(')
+            stackOfSigns.pop()
+            return true
+        }
+        //Dokonaj działania jeżeli priorytet jest niższy lub ten sam
         if (sign2 in arrayOf('+','-') && stackOfSigns.peek() in arrayOf('+','-')||
             sign2 in arrayOf('+','-') && stackOfSigns.peek() in arrayOf('*','/')||
-            sign2 in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('*','/')) {
+            sign2 in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('*','/')){
             dzialanie()
             update(sign2)
             return true
         }
-        if(sign2 in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('+','-')){
+        //Jeżeli prioretet jest wyższy lub wpisany został nawias dodaj na stos znaków.
+        if (sign2 in arrayOf('+','-') && stackOfSigns.peek() in arrayOf('*','/','(',')')||
+            sign2 in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('(',')')||
+            sign2 == ('(') && stackOfSigns.peek() in arrayOf('+','-','*','/')){
             update(sign2)
             return true
         }
@@ -118,7 +130,6 @@ fun wpisano_znak(sign2 : Char) : Boolean {
 }
 
 fun dzialanie(){
-    println(wyswietlacz)
     println("Przed dokonaniem działania")
     println("\t stackOfValues: $stackOfValues")
     println("\t stackOfSigns: $stackOfSigns")
@@ -134,16 +145,17 @@ fun main() {
     println("Szymon Woyda 227458")
 
     do {
-        if(pierwsza_liczba) {
+        if (pierwsza_liczba) {
             pierwsza_liczba = false
             wpisz()
         }
+        val kontynuuj: Boolean = wpisz()
 
-        val kontynuuj : Boolean = wpisz()
+       if(kontynuuj) wpisz()
 
-        if(kontynuuj) wpisz()
+//    } while (stackOfSigns.isNotEmpty())
+    }while (kontynuuj)
 
-    } while (stackOfSigns.isNotEmpty())
-
+    println(wyswietlacz)
     println("Wynik: $wynik")
 }
