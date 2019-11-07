@@ -1,18 +1,19 @@
 import java.util.Stack
 
-var wynik : Double = 0.0
+const val ZERO : Double = 0.0
+var wynik : Double = ZERO
 var pierwsza_liczba : Boolean = true
 
-var stackOfValues = Stack<Double>()
-var stackOfSigns = Stack<Char>()
+var stosWartosci = Stack<Double>()
+var stosZnakow = Stack<Char>()
 
 var wyswietlacz = ArrayList<String>()
 
 //Zamiana kolejności itemów związana jest z kolejnością zdejmowania wartości ze stosu
-fun dodawanie(item1: Double, item2: Double): Double = item2 + item1
-fun odejmowanie(item1: Double, item2: Double): Double = item2 - item1
-fun mnozenie(item1: Double, item2: Double): Double = item1 * item2
-fun dzielenie(item1: Double, item2: Double) : Double = item2 / item1
+fun dodawanie(zmienna1: Double, zmienna2: Double): Double = zmienna2 + zmienna1
+fun odejmowanie(zmienna1: Double, zmienna2: Double): Double = zmienna2 - zmienna1
+fun mnozenie(zmienna1: Double, zmienna2: Double): Double = zmienna1 * zmienna2
+fun dzielenie(zmienna1: Double, zmienna2: Double) : Double = zmienna2 / zmienna1
 
 fun silnia(item1: Double) : Double{
     val factorial : Double = silnia_recursja(item1)
@@ -23,95 +24,95 @@ fun silnia_recursja(num: Double): Double {
     else        return 1.0 }
 
 fun sprawdz_dziel0(value: Double){
-    if (stackOfSigns.isNotEmpty()){
-        if (stackOfSigns.peek() == ('/') && value == 0.0){
+    if (stosZnakow.isNotEmpty()){
+        if (stosZnakow.peek() == ('/') && value == ZERO){
             print("Nie można dzielić przez zero")
-            System.exit(0) }
+            System.exit(ZERO.toInt()) }
     }
 }
 
-fun update(sign: Char){
-    stackOfSigns.push(sign)
+fun aktualizuj(sign: Char){
+    stosZnakow.push(sign)
     wyswietlacz.add(sign.toString()) }
 
 fun liczenie(){
-    if(stackOfSigns.isNotEmpty() && stackOfValues.isNotEmpty()) {
+    if(stosZnakow.isNotEmpty() && stosWartosci.isNotEmpty()) {
 
-        when (stackOfSigns.pop()) {
-            '+' -> wynik = dodawanie(stackOfValues.pop(), stackOfValues.pop())
-            '-' -> wynik = odejmowanie(stackOfValues.pop(), stackOfValues.pop())
-            '*' -> wynik = mnozenie(stackOfValues.pop(), stackOfValues.pop())
-            '/' -> wynik = dzielenie(stackOfValues.pop(), stackOfValues.pop())
+        when (stosZnakow.pop()) {
+            '+' -> wynik = dodawanie(stosWartosci.pop(), stosWartosci.pop())
+            '-' -> wynik = odejmowanie(stosWartosci.pop(), stosWartosci.pop())
+            '*' -> wynik = mnozenie(stosWartosci.pop(), stosWartosci.pop())
+            '/' -> wynik = dzielenie(stosWartosci.pop(), stosWartosci.pop())
         }
-        stackOfValues.push(wynik) }
+        stosWartosci.push(wynik) }
 }
 
 fun wpisz() : Boolean{
-    println("Liczba/Znak: ")
-    val entered = readLine()
+    println("Wartość/Znak: ")
+    val wpisana = readLine()
     try{
-        val enteredValue = entered!!.toDouble()
-        wpisano_liczbe(enteredValue)
+        val wpisanaWartosc = wpisana!!.toDouble()
+        wpisano_liczbe(wpisanaWartosc)
         return true }
 
     catch (nfe: NumberFormatException){
-        val enteredSign = entered!![0]
-        wpisano_znak(enteredSign)
+        val wpisanyZnak = wpisana!![0]
+        wpisano_znak(wpisanyZnak)
         //Kontynuj wpisywanie znaków pod warunkiem, że nie zostało wpisane '='
-        return enteredSign != '=' }
+        return wpisanyZnak != '=' }
 }
 
-fun wpisano_liczbe(value2: Double) {
-    sprawdz_dziel0(value2)
-    stackOfValues.push(value2)
-    wyswietlacz.add(value2.toString()) }
+fun wpisano_liczbe(tymczasowa: Double) {
+    sprawdz_dziel0(tymczasowa)
+    stosWartosci.push(tymczasowa)
+    wyswietlacz.add(tymczasowa.toString()) }
 
-fun wpisano_znak(sign2 : Char) : Boolean {
+fun wpisano_znak(znak : Char) : Boolean {
     //Jeżeli stos liczb jest pusty a został wpisany znak dodaj do stosu liczb 0 na poczatku
-    if(stackOfValues.isEmpty() && sign2 != '('){
-        stackOfValues.push(0.0)
-        wyswietlacz.add((0.0).toString()) }
+    if(stosWartosci.isEmpty() && znak != '('){
+        stosWartosci.push(ZERO)
+        wyswietlacz.add((ZERO).toString()) }
 
     //'p' plus/minus +/-    //'s' silnia n!
-    if(sign2 == 'p' || sign2 == 's'){
-        var zmiana = stackOfValues.pop()
+    if(znak == 'p' || znak == 's'){
+        var zmiana = stosWartosci.pop()
         wyswietlacz.removeAt(wyswietlacz.lastIndex)
-        if(sign2 == 'p') zmiana = -zmiana
-        if(sign2 == 's') zmiana = silnia(zmiana)
-        stackOfValues.push(zmiana)
+        if(znak == 'p') zmiana = -zmiana
+        if(znak == 's') zmiana = silnia(zmiana)
+        stosWartosci.push(zmiana)
         wyswietlacz.add(zmiana.toString())
         return false }
 
-    if(stackOfSigns.isEmpty()){
-        if (sign2 in arrayOf ('+','-','/','*','(')) {
-            update(sign2)
+    if(stosZnakow.isEmpty()){
+        if (znak in arrayOf ('+','-','/','*','(')) {
+            aktualizuj(znak)
             return true } }
 
-    if (stackOfSigns.isNotEmpty()){
-        if (sign2 == ')'){
-            wyswietlacz.add(sign2.toString())
+    if (stosZnakow.isNotEmpty()){
+        if (znak == ')'){
+            wyswietlacz.add(znak.toString())
             do dzialanie()
-            while(stackOfSigns.peek() != '(')
-            stackOfSigns.pop()
+            while(stosZnakow.peek() != '(')
+            stosZnakow.pop()
             return true }
 
-        if (sign2 in arrayOf('+','-') && stackOfSigns.peek() in arrayOf('+','-')||
-            sign2 in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('*','/')||
-            sign2 in arrayOf('+','-','*','/') && stackOfSigns.peek() in arrayOf('*','/')){
+        if (znak in arrayOf('+','-') && stosZnakow.peek() in arrayOf('+','-')||
+            znak in arrayOf('*','/') && stosZnakow.peek() in arrayOf('*','/')||
+            znak in arrayOf('+','-','*','/') && stosZnakow.peek() in arrayOf('*','/')){
             dzialanie()
-            update(sign2)
+            aktualizuj(znak)
             return true }
 
-        if (sign2 in arrayOf('+','-') && stackOfSigns.peek() in arrayOf('*','/','(',')')||
-            sign2 in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('+','-')||
-            sign2 in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('(',')')||
-            sign2 == ('(') && stackOfSigns.peek() in arrayOf('+','-','*','/')){
-            update(sign2)
+        if (znak in arrayOf('+','-') && stosZnakow.peek() in arrayOf('*','/','(',')')||
+            znak in arrayOf('*','/') && stosZnakow.peek() in arrayOf('+','-')||
+            znak in arrayOf('*','/') && stosZnakow.peek() in arrayOf('(',')')||
+            znak == ('(') && stosZnakow.peek() in arrayOf('+','-','*','/')){
+            aktualizuj(znak)
             return true }
 
-        if(sign2 == '='){
+        if(znak == '='){
             do dzialanie()
-                while(stackOfSigns.isNotEmpty())
+                while(stosZnakow.isNotEmpty())
             return false
         }
     }
@@ -120,14 +121,14 @@ fun wpisano_znak(sign2 : Char) : Boolean {
 
 fun dzialanie(){
     println("Przed dokonaniem działania")
-    println("\t stackOfValues: $stackOfValues")
-    println("\t stackOfSigns: $stackOfSigns")
+    println("\t stosWartosci: $stosWartosci")
+    println("\t stosZnakow: $stosZnakow")
 
     liczenie()
 
     println("Po dokonaniu działania")
-    println("\t stackOfValues: $stackOfValues")
-    println("\t stackOfSigns: $stackOfSigns") }
+    println("\t stosWartosci: $stosWartosci")
+    println("\t stosZnakow: $stosZnakow") }
 
 fun main() {
     println("Szymon Woyda 227458")
