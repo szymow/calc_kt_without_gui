@@ -16,29 +16,23 @@ fun dzielenie(item1: Double, item2: Double) : Double = item2 / item1
 
 fun silnia(item1: Double) : Double{
     val factorial : Double = silnia_recursja(item1)
-    return factorial
-}
+    return factorial }
 
 fun silnia_recursja(num: Double): Double {
-    if (num >= 1.0)
-        return num * silnia_recursja(num - 1.0)
-    else
-        return 1.0
-}
+    if (num >= 1.0)     return num * silnia_recursja(num - 1.0)
+    else        return 1.0 }
 
 fun sprawdz_dziel0(value: Double){
     if (stackOfSigns.isNotEmpty()){
         if (stackOfSigns.peek() == ('/') && value == 0.0){
             print("Nie można dzielić przez zero")
-            System.exit(0)
-        }
+            System.exit(0) }
     }
 }
 
 fun update(sign: Char){
     stackOfSigns.push(sign)
-    wyswietlacz.add(sign.toString())
-}
+    wyswietlacz.add(sign.toString()) }
 
 fun liczenie(){
     if(stackOfSigns.isNotEmpty() && stackOfValues.isNotEmpty()) {
@@ -49,38 +43,35 @@ fun liczenie(){
             '*' -> wynik = mnozenie(stackOfValues.pop(), stackOfValues.pop())
             '/' -> wynik = dzielenie(stackOfValues.pop(), stackOfValues.pop())
         }
-        stackOfValues.push(wynik)
-    }
+        stackOfValues.push(wynik) }
 }
 
 fun wpisz() : Boolean{
-    println("Wpisz coś: ")
+    println("Liczba/Znak: ")
     val entered = readLine()
     try{
         val enteredValue = entered!!.toDouble()
         wpisano_liczbe(enteredValue)
-        return true
-    }
+        return true }
+
     catch (nfe: NumberFormatException){
         val enteredSign = entered!![0]
         wpisano_znak(enteredSign)
         //Kontynuj wpisywanie znaków pod warunkiem, że nie zostało wpisane '='
-        return enteredSign != '='
-    }
+        return enteredSign != '=' }
 }
 
 fun wpisano_liczbe(value2: Double) {
     sprawdz_dziel0(value2)
     stackOfValues.push(value2)
-    wyswietlacz.add(value2.toString())
-}
+    wyswietlacz.add(value2.toString()) }
 
 fun wpisano_znak(sign2 : Char) : Boolean {
     //Jeżeli stos liczb jest pusty a został wpisany znak dodaj do stosu liczb 0 na poczatku
     if(stackOfValues.isEmpty() && sign2 != '('){
         stackOfValues.push(0.0)
-        wyswietlacz.add((0.0).toString())
-    }
+        wyswietlacz.add((0.0).toString()) }
+
     //'p' plus/minus +/-    //'s' silnia n!
     if(sign2 == 'p' || sign2 == 's'){
         var zmiana = stackOfValues.pop()
@@ -89,37 +80,35 @@ fun wpisano_znak(sign2 : Char) : Boolean {
         if(sign2 == 's') zmiana = silnia(zmiana)
         stackOfValues.push(zmiana)
         wyswietlacz.add(zmiana.toString())
-        return false
-    }
+        return false }
+
     if(stackOfSigns.isEmpty()){
         if (sign2 in arrayOf ('+','-','/','*','(')) {
             update(sign2)
-            return true
-        }
-    }
+            return true } }
+
     if (stackOfSigns.isNotEmpty()){
         if (sign2 == ')'){
             wyswietlacz.add(sign2.toString())
             do dzialanie()
             while(stackOfSigns.peek() != '(')
             stackOfSigns.pop()
-            return true
-        }
-        //Dokonaj działania jeżeli priorytet jest niższy lub ten sam
+            return true }
+
         if (sign2 in arrayOf('+','-') && stackOfSigns.peek() in arrayOf('+','-')||
-            sign2 in arrayOf('+','-') && stackOfSigns.peek() in arrayOf('*','/')||
-            sign2 in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('*','/')){
+            sign2 in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('*','/')||
+            sign2 in arrayOf('+','-','*','/') && stackOfSigns.peek() in arrayOf('*','/')){
             dzialanie()
             update(sign2)
-            return true
-        }
-        //Jeżeli prioretet jest wyższy lub wpisany został nawias dodaj na stos znaków.
+            return true }
+
         if (sign2 in arrayOf('+','-') && stackOfSigns.peek() in arrayOf('*','/','(',')')||
+            sign2 in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('+','-')||
             sign2 in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('(',')')||
             sign2 == ('(') && stackOfSigns.peek() in arrayOf('+','-','*','/')){
             update(sign2)
-            return true
-        }
+            return true }
+
         if(sign2 == '='){
             do dzialanie()
                 while(stackOfSigns.isNotEmpty())
@@ -138,23 +127,19 @@ fun dzialanie(){
 
     println("Po dokonaniu działania")
     println("\t stackOfValues: $stackOfValues")
-    println("\t stackOfSigns: $stackOfSigns")
-}
+    println("\t stackOfSigns: $stackOfSigns") }
 
 fun main() {
     println("Szymon Woyda 227458")
 
-    do {
+    do{
         if (pierwsza_liczba) {
             pierwsza_liczba = false
-            wpisz()
-        }
+            wpisz() }
+
         val kontynuuj: Boolean = wpisz()
-
        if(kontynuuj) wpisz()
-
-//    } while (stackOfSigns.isNotEmpty())
-    }while (kontynuuj)
+    } while (kontynuuj)
 
     println(wyswietlacz)
     println("Wynik: $wynik")
