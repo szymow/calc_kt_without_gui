@@ -6,7 +6,7 @@ var pierwsza_liczba : Boolean = true
 var stackOfValues = Stack<Double>()
 var stackOfSigns = Stack<Char>()
 
-var wyswietlacz = mutableListOf<String>()
+var wyswietlacz = ArrayList<String>()
 
 //Zamiana kolejności itemów związana jest z kolejnością zdejmowania wartości ze stosu
 fun dodawanie(item1: Double, item2: Double): Double = item2 + item1
@@ -40,44 +40,69 @@ fun liczenie(){
     }
 }
 
-fun wpisz_liczbe() {
-    print("Wpisz liczbę: ")
-    val enteredValue: Double = readLine()!!.toDouble()
-    sprawdz_dziel0(enteredValue)
-    stackOfValues.push(enteredValue)
-    wyswietlacz.add(enteredValue.toString())
+fun wpisz() : Boolean{
+    println("Wpisz coś: ")
+    val entered = readLine()
+    try{
+        val enteredValue = entered!!.toDouble()
+        wpisano_liczbe(enteredValue)
+        return true
+    }
+    catch (nfe: NumberFormatException){
+        val enteredSign = entered!![0]
+        wpisano_znak(enteredSign)
+        //Kontynuj wpisywanie znaków pod warunkiem, że nie zostało wpisane '='
+        return enteredSign != '='
+    }
 }
 
-fun wpisz_znak() : Boolean {
-    print("Wpisz znak: ")
-    val enteredSign = readLine()!![0] //Czytaj tylko jeden, pierwszy wprowadzony znak
+fun wpisano_liczbe(value2: Double) {
+    sprawdz_dziel0(value2)
+    stackOfValues.push(value2)
+    wyswietlacz.add(value2.toString())
+}
+
+fun wpisano_znak(sign2 : Char) : Boolean {
+    //Jeżeli stos liczb jest pusty a został wpisany znak dodaj do stosu liczb 0 na poczatku
+    if(stackOfValues.isEmpty()){
+        stackOfValues.push(0.0)
+        wyswietlacz.add((0.0).toString())
+    }
+    //'p' plus/minus +/-
+    if(sign2 == 'p'){
+        var zmiana_znaku = stackOfValues.pop()
+        wyswietlacz.removeAt(wyswietlacz.lastIndex)
+        zmiana_znaku = -zmiana_znaku
+        stackOfValues.push(zmiana_znaku)
+        wyswietlacz.add(zmiana_znaku.toString())
+    }
     if(stackOfSigns.isEmpty()){
-        if (enteredSign in arrayOf ('+','-','/','*')) {
-            update(enteredSign)
+        if (sign2 in arrayOf ('+','-','/','*')) {
+            update(sign2)
             return true
         }
     }
     if (stackOfSigns.isNotEmpty()){
-        if (enteredSign in arrayOf('+','-') && stackOfSigns.peek() in arrayOf('+','-')) {
+        if (sign2 in arrayOf('+','-') && stackOfSigns.peek() in arrayOf('+','-')) {
             dzialanie()
-            update(enteredSign)
+            update(sign2)
             return true
         }
-        if(enteredSign in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('+','-')){
-            update(enteredSign)
+        if(sign2 in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('+','-')){
+            update(sign2)
             return true
         }
-        if(enteredSign in arrayOf('+','-') && stackOfSigns.peek() in arrayOf('*','/')){
+        if(sign2 in arrayOf('+','-') && stackOfSigns.peek() in arrayOf('*','/')){
             dzialanie()
-            update(enteredSign)
+            update(sign2)
             return true
         }
-        if (enteredSign in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('*','/')) {
+        if (sign2 in arrayOf('*','/') && stackOfSigns.peek() in arrayOf('*','/')) {
             dzialanie()
-            update(enteredSign)
+            update(sign2)
             return true
         }
-        if(enteredSign == '='){
+        if(sign2 == '='){
             do dzialanie()
                 while(stackOfSigns.isNotEmpty())
             return false
@@ -105,12 +130,12 @@ fun main() {
     do {
         if(pierwsza_liczba) {
             pierwsza_liczba = false
-            wpisz_liczbe()
+            wpisz()
         }
 
-        val kontynuuj : Boolean = wpisz_znak()
+        val kontynuuj : Boolean = wpisz()
 
-        if(kontynuuj) wpisz_liczbe()
+        if(kontynuuj) wpisz()
 
     } while (stackOfSigns.isNotEmpty())
 
