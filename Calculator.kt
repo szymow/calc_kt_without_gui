@@ -35,12 +35,22 @@ class Calculator : View() {
         }
     }
 
-
+/*
     val displayValue: Double
         get() = when(display.text){
             ""->0.0
             else->display.text.toDouble()
         }
+ */
+    val displayValue: Double get() = display.text.toDouble()
+
+    fun silnia(item1: Double) : Double{
+        val factorial : Double = silnia_recursja(item1)
+        return factorial }
+
+    fun silnia_recursja(num: Double): Double {
+        if (num >= 1.0)     return num * silnia_recursja(num - 1.0)
+        else        return 1.0 }
 
     fun sprawdz_dziel0(value: Double){
         if (stosZnakow.isNotEmpty()){
@@ -62,10 +72,20 @@ class Calculator : View() {
         wyswietlacz.add(sign.toString()) }
 
     fun wpisano_znak(znak : Char) : Boolean {
+        //Jeżeli stos liczb jest pusty a został wpisany znak dodaj do stosu liczb 0 na poczatku
         if(stosWartosci.isEmpty() && znak != '(') {
             stosWartosci.push(ZERO)
             wyswietlacz.add((ZERO).toString())
         }
+        //'p' plus/minus +/-    //'s' silnia n!
+        if(znak == 'p' || znak == 's'){
+            var zmiana = stosWartosci.pop()
+            wyswietlacz.removeAt(wyswietlacz.lastIndex)
+            if(znak == 'p') zmiana = -zmiana
+            if(znak == 's') zmiana = silnia(zmiana)
+            stosWartosci.push(zmiana)
+            wyswietlacz.add(zmiana.toString())
+            return false }
         if (stosZnakow.isEmpty()) {
             if (znak in arrayOf('+', '-', '/', '*', '(')) {
                 aktualizuj(znak)
@@ -148,8 +168,12 @@ class Calculator : View() {
         if(Regex("[0-9.]").matches(x)){
             display.text += x
         }
+        if(Regex("[(]").matches(x)){
+            aktualizuj('(')
+            display2.text = wyswietlacz.joinToString("")
+        }
         else{
-            if(Regex("[+-/*=()]").matches(x)){
+            if(Regex("[+-/*)=]").matches(x)){
             wpisz()
                 val wpisanyZnak = x!![0]
             wpisano_znak(wpisanyZnak)
