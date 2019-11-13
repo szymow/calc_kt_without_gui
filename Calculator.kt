@@ -3,18 +3,26 @@ import javafx.scene.control.Label
 import javafx.scene.layout.VBox
 import tornadofx.*
 import javafx.scene.input.KeyEvent
-import Operator.*
 import javafx.scene.control.Button
-import javafx.scene.control.TextField
-import javafx.scene.layout.AnchorPane
+
+import java.util.Stack
+
+const val ZERO : Double = 0.0
+var wynik : Double = ZERO
+
+var stosWartosci = Stack<Double>()
+var stosZnakow = Stack<Char>()
+
+var wyswietlacz = ArrayList<String>()
 
 class Calculator : View() {
     override val root: VBox by fxml()
-    @FXML lateinit var display: Label
+    @FXML lateinit var display3: Label
     @FXML lateinit var display2: Label
+    @FXML lateinit var display: Label
 
     init {
-        title = "Szymon Woyda 227458"
+        title = "Woyda 227458"
 
         root.lookupAll(".button").forEach{ b ->
             b.setOnMouseClicked {
@@ -27,12 +35,6 @@ class Calculator : View() {
         }
     }
 
-    var state: Operator = add(0.0)
-
-    fun onAction(fn: Operator){
-        state=fn
-        display.text=""
-    }
 
     val displayValue: Double
         get() = when(display.text){
@@ -40,18 +42,121 @@ class Calculator : View() {
             else->display.text.toDouble()
         }
 
+    fun sprawdz_dziel0(value: Double){
+        if (stosZnakow.isNotEmpty()){
+            if (stosZnakow.peek() == ('/') && value == ZERO){
+                print("Nie można dzielić przez zero")
+                System.exit(ZERO.toInt())
+            }
+        }
+    }
+
+    fun wpisano_liczbe(tymczasowa: Double) {
+        sprawdz_dziel0(tymczasowa)
+        stosWartosci.push(tymczasowa)
+        wyswietlacz.add(tymczasowa.toString())
+    }
+
+    fun aktualizuj(sign: Char){
+        stosZnakow.push(sign)
+        wyswietlacz.add(sign.toString()) }
+
+    fun wpisano_znak(znak : Char) : Boolean {
+        if(stosWartosci.isEmpty() && znak != '(') {
+            stosWartosci.push(ZERO)
+            wyswietlacz.add((ZERO).toString())
+        }
+        if (stosZnakow.isEmpty()) {
+            if (znak in arrayOf('+', '-', '/', '*', '(')) {
+                aktualizuj(znak)
+                return true
+            }
+        }
+        if (stosZnakow.isNotEmpty()) {
+            if (znak == ')'){
+                wyswietlacz.add(znak.toString())
+                do dzialanie()
+                while(stosZnakow.peek() != '(')
+                stosZnakow.pop()
+                return true }
+            if (znak in arrayOf('+', '-') && stosZnakow.peek() in arrayOf('+', '-') ||
+                znak in arrayOf('*', '/') && stosZnakow.peek() in arrayOf('*', '/') ||
+                znak in arrayOf('+', '-', '*', '/') && stosZnakow.peek() in arrayOf('*', '/')
+            ) {
+                dzialanie()
+                display3.text = stosWartosci.peek().toString()
+                aktualizuj(znak)
+                return true
+            }
+            if (znak in arrayOf('+', '-') && stosZnakow.peek() in arrayOf('*', '/', '(', ')') ||
+                znak in arrayOf('*', '/') && stosZnakow.peek() in arrayOf('+', '-') ||
+                znak in arrayOf('*', '/') && stosZnakow.peek() in arrayOf('(', ')') ||
+                znak == ('(') && stosZnakow.peek() in arrayOf('+', '-', '*', '/')
+            ) {
+                aktualizuj(znak)
+                return true
+            }
+            if (znak == '=') {
+                do dzialanie()
+                while (stosZnakow.isNotEmpty())
+                display3.text = stosWartosci.peek().toString()
+                return false
+            }
+        }
+        return false
+    }
+
+    fun dzialanie(){
+        println("Przed dokonaniem działania")
+        println("\t stosWartosci: $stosWartosci")
+        println("\t stosZnakow: $stosZnakow")
+
+        liczenie()
+
+        println("Po dokonaniu działania")
+        println("\t stosWartosci: $stosWartosci")
+        println("\t stosZnakow: $stosZnakow")
+    }
+
+    //Zamiana kolejności itemów związana jest z kolejnością zdejmowania wartości ze stosu
+    fun dodawanie(zmienna1: Double, zmienna2: Double): Double = zmienna2 + zmienna1
+    fun odejmowanie(zmienna1: Double, zmienna2: Double): Double = zmienna2 - zmienna1
+    fun mnozenie(zmienna1: Double, zmienna2: Double): Double = zmienna1 * zmienna2
+    fun dzielenie(zmienna1: Double, zmienna2: Double) : Double = zmienna2 / zmienna1
+
+    fun liczenie(){
+        if(stosZnakow.isNotEmpty() && stosWartosci.isNotEmpty()) {
+
+            when (stosZnakow.pop()) {
+                '+' -> wynik = dodawanie(stosWartosci.pop(), stosWartosci.pop())
+                '-' -> wynik = odejmowanie(stosWartosci.pop(), stosWartosci.pop())
+                '*' -> wynik = mnozenie(stosWartosci.pop(), stosWartosci.pop())
+                '/' -> wynik = dzielenie(stosWartosci.pop(), stosWartosci.pop())
+            }
+            stosWartosci.push(wynik)
+        }
+    }
+
+    fun wpisz() {
+        println("Wartość/Znak: ")
+        val wpisana = displayValue
+        val wpisanaWartosc = wpisana!!.toDouble()
+        wpisano_liczbe(wpisanaWartosc)
+    }
+
     private fun operator(x:String){
         if(Regex("[0-9.]").matches(x)){
             display.text += x
         }
         else{
-            when(x){
-                "+" -> onAction(add(displayValue))
-                "-" -> onAction(sub(displayValue))
-                "*" -> onAction(mult(displayValue))
-                "/" -> onAction(div(displayValue))
-                "=" -> display.text = state.calculate((displayValue)).toString()
+            if(Regex("[+-/*=()]").matches(x)){
+            wpisz()
+                val wpisanyZnak = x!![0]
+            wpisano_znak(wpisanyZnak)
+                display.text = ""
+                display2.text = wyswietlacz.joinToString("")
+            }
+
             }
         }
     }
-}
